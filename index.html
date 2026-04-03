@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bella Imagem — Fotos de Moda com IA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bella: {
+              black: '#0a0a0a',
+              dark: '#1a1a1a',
+              gold: '#c9a96e',
+              'gold-light': '#dfc9a0',
+              rose: '#e8b4b8',
+              'rose-light': '#f5d5d8',
+              cream: '#faf6f0',
+              white: '#fefefe',
+              gray: '#6b6b6b',
+              'gray-light': '#b0b0b0',
+            }
+          },
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body: ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: #0a0a0a; color: #fefefe; overflow-x: hidden; }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #c9a96e; border-radius: 3px; }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(1deg); }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(201,169,110,0.15); }
+      50% { box-shadow: 0 0 40px rgba(201,169,110,0.3); }
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes hero-gradient {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.9; }
+    }
+
+    .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; opacity: 0; }
+    .animate-fade-in { animation: fadeIn 1s ease forwards; opacity: 0; }
+    .animate-scale-in { animation: scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; opacity: 0; }
+    .delay-1 { animation-delay: 0.15s; }
+    .delay-2 { animation-delay: 0.3s; }
+    .delay-3 { animation-delay: 0.45s; }
+    .delay-4 { animation-delay: 0.6s; }
+    .delay-5 { animation-delay: 0.75s; }
+    .delay-6 { animation-delay: 0.9s; }
+
+    .shimmer-text {
+      background: linear-gradient(90deg, #c9a96e 0%, #f5e6c8 25%, #c9a96e 50%, #f5e6c8 75%, #c9a96e 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 4s linear infinite;
+    }
+
+    .hero-mesh {
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(201,169,110,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 60% at 80% 20%, rgba(232,180,184,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 80% at 50% 80%, rgba(201,169,110,0.05) 0%, transparent 60%);
+    }
+
+    /* Floating decorative elements */
+    .float-element {
+      position: absolute;
+      border: 1px solid rgba(201,169,110,0.12);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .float-1 { width: 300px; height: 300px; top: 10%; right: -5%; animation: float 8s ease-in-out infinite; }
+    .float-2 { width: 180px; height: 180px; bottom: 20%; left: -3%; animation: float 6s ease-in-out infinite 1s; }
+    .float-3 { width: 100px; height: 100px; top: 60%; right: 10%; animation: float 7s ease-in-out infinite 2s; border-color: rgba(232,180,184,0.1); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #c9a96e 0%, #dfc9a0 100%);
+      color: #0a0a0a;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #dfc9a0 0%, #f5e6c8 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,169,110,0.3); }
+    .btn-primary span { position: relative; z-index: 1; }
+
+    .btn-outline {
+      border: 1px solid rgba(201,169,110,0.4);
+      color: #c9a96e;
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .btn-outline:hover {
+      background: rgba(201,169,110,0.08);
+      border-color: #c9a96e;
+      transform: translateY(-2px);
+    }
+
+    /* Plan card styles */
+    .plan-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .plan-card:hover {
+      border-color: rgba(201,169,110,0.2);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .plan-featured {
+      background: linear-gradient(180deg, rgba(201,169,110,0.06) 0%, rgba(201,169,110,0.02) 100%);
+      border-color: rgba(201,169,110,0.3);
+      animation: pulse-glow 4s ease-in-out infinite;
+    }
+    .plan-featured:hover {
+      border-color: rgba(201,169,110,0.5);
+    }
+
+    .pain-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.4s ease;
+    }
+    .pain-card:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(201,169,110,0.15);
+      transform: translateY(-4px);
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.4s ease;
+    }
+    .feature-card:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(201,169,110,0.2);
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .faq-item:hover { background: rgba(255,255,255,0.02); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1), padding 0.3s ease;
+    }
+    .faq-item.active .faq-answer { max-height: 200px; }
+    .faq-item .faq-icon { transition: transform 0.3s ease; }
+    .faq-item.active .faq-icon { transform: rotate(45deg); }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 30s linear infinite;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(201,169,110,0.2) 50%, transparent 100%);
+    }
+
+    /* Intersection observer reveal */
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Mobile nav */
+    .mobile-nav { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .mobile-nav.open { transform: translateX(0); }
+
+    /* Photo grid mockups */
+    .mock-img {
+      background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(232,180,184,0.1));
+      position: relative;
+      overflow: hidden;
+    }
+    .mock-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="fixed top-0 left-0 w-full z-50 transition-all duration-500" id="navbar">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-bella-gold to-bella-rose flex items-center justify-center">
+          <i class="fa-solid fa-sparkles text-bella-black text-sm"></i>
+        </div>
+        <span class="font-display text-xl font-semibold tracking-wide">Bella<span class="text-bella-gold">Imagem</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#solucao" class="text-sm text-bella-gray-light hover:text-bella-gold transition-colors duration-300 font-body tracking-wide">Solução</a>
+        <a href="#funcionalidades" class="text-sm text-bella-gray-light hover:text-bella-gold transition-colors duration-300 font-body tracking-wide">Funcionalidades</a>
+        <a href="#planos" class="text-sm text-bella-gray-light hover:text-bella-gold transition-colors duration-300 font-body tracking-wide">Planos</a>
+        <a href="#faq" class="text-sm text-bella-gray-light hover:text-bella-gold transition-colors duration-300 font-body tracking-wide">FAQ</a>
+        <a href="#planos" class="btn-primary px-6 py-2.5 rounded-full text-sm tracking-widest uppercase"><span>Começar</span></a>
+      </div>
+      <button class="md:hidden text-bella-white text-xl" onclick="toggleMobile()">
+        <i class="fa-solid fa-bars" id="menuIcon"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav fixed inset-0 z-[60] bg-bella-black/98 backdrop-blur-xl flex flex-col items-center justify-center gap-8" id="mobileNav">
+    <button class="absolute top-5 right-5 text-2xl text-bella-white" onclick="toggleMobile()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <a href="#solucao" onclick="toggleMobile()" class="text-2xl font-display text-bella-white hover:text-bella-gold transition-colors">Solução</a>
+    <a href="#funcionalidades" onclick="toggleMobile()" class="text-2xl font-display text-bella-white hover:text-bella-gold transition-colors">Funcionalidades</a>
+    <a href="#planos" onclick="toggleMobile()" class="text-2xl font-display text-bella-white hover:text-bella-gold transition-colors">Planos</a>
+    <a href="#faq" onclick="toggleMobile()" class="text-2xl font-display text-bella-white hover:text-bella-gold transition-colors">FAQ</a>
+    <a href="#planos" onclick="toggleMobile()" class="btn-primary px-10 py-3 rounded-full text-sm tracking-widest uppercase mt-4"><span>Começar Agora</span></a>
+  </div>
+
+  <!-- ==================== HERO ==================== -->
+  <header class="relative min-h-screen flex items-center hero-mesh overflow-hidden">
+    <!-- Decorative elements -->
+    <div class="float-element float-1"></div>
+    <div class="float-element float-2"></div>
+    <div class="float-element float-3"></div>
+
+    <!-- Vertical side text -->
+    <div class="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 -rotate-90 origin-center">
+      <span class="text-[10px] tracking-[0.4em] uppercase text-bella-gray font-body">Inteligência Artificial × Moda</span>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 w-full pt-28 pb-20 lg:pt-0 lg:pb-0">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+
+        <!-- Left Content -->
+        <div class="max-w-xl">
+          <div class="animate-fade-up">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-bella-gold/20 bg-bella-gold/5 mb-8">
+              <span class="w-1.5 h-1.5 rounded-full bg-bella-gold animate-pulse"></span>
+              <span class="text-xs tracking-widest uppercase text-bella-gold font-body">Novo — IA Generativa para Moda</span>
+            </div>
+          </div>
+
+          <h1 class="font-display text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl leading-[1.1] font-medium animate-fade-up delay-1">
+            Transforme seus produtos em
+            <span class="italic shimmer-text"> editoriais de moda</span>
+            com Inteligência Artificial.
+          </h1>
+
+          <p class="mt-6 text-base sm:text-lg text-bella-gray-light font-body leading-relaxed animate-fade-up delay-2">
+            Crie fotos de modelos profissionais para sua loja em segundos, sem gastar com estúdios ou equipamentos caros.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 mt-10 animate-fade-up delay-3">
+            <a href="#planos" class="btn-primary px-8 py-4 rounded-full text-sm tracking-widest uppercase text-center">
+              <span><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Começar Gratuitamente</span>
+            </a>
+            <a href="#solucao" class="btn-outline px-8 py-4 rounded-full text-sm tracking-widest uppercase text-center">
+              Como Funciona
+            </a>
+          </div>
+
+          <div class="flex items-center gap-6 mt-10 animate-fade-up delay-4">
+            <div class="flex -space-x-2">
+              <div class="w-8 h-8 rounded-full bg-bella-rose/30 border-2 border-bella-black flex items-center justify-center text-[10px]">👗</div>
+              <div class="w-8 h-8 rounded-full bg-bella-gold/30 border-2 border-bella-black flex items-center justify-center text-[10px]">👜</div>
+              <div class="w-8 h-8 rounded-full bg-bella-rose/20 border-2 border-bella-black flex items-center justify-center text-[10px]">💍</div>
+            </div>
+            <p class="text-xs text-bella-gray font-body">
+              <span class="text-bella-white font-semibold">+2.400 lojistas</span> já transformam suas vitrines digitais
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Mockup Grid -->
+        <div class="relative animate-fade-in delay-3">
+          <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto lg:max-w-none">
+            <div class="space-y-3 sm:space-y-4 pt-8">
+              <div class="mock-img rounded-2xl aspect-[3/4] flex flex-col items-center justify-center p-4">
+                <i class="fa-solid fa-camera-retro text-3xl text-bella-gold/30 mb-3"></i>
+                <span class="text-[10px] tracking-widest uppercase text-bella-gray">Editorial Look</span>
+              </div>
+              <div class="mock-img rounded-2xl aspect-square flex flex-col items-center justify-center p-4">
+                <i class="fa-solid fa-wand-magic-sparkles text-2xl text-bella-rose/30 mb-2"></i>
+                <span class="text-[10px] tracking-widest uppercase text-bella-gray">IA Gen</span>
+              </div>
+            </div>
+            <div class="space-y-3 sm:space-y-4">
+              <div class="mock-img rounded-2xl aspect-square flex flex-col items-center justify-center p-4">
+                <i class="fa-solid fa-image text-2xl text-bella-gold/30 mb-2"></i>
+                <span class="text-[10px] tracking-widest uppercase text-bella-gray">Alta Resolução</span>
+              </div>
+              <div class="mock-img rounded-2xl aspect-[3/4] flex flex-col items-center justify-center p-4">
+                <i class="fa-brands fa-instagram text-3xl text-bella-rose/30 mb-3"></i>
+                <span class="text-[10px] tracking-widest uppercase text-bella-gray">Pronto p/ Post</span>
+              </div>
+            </div>
+          </div>
+          <!-- Decorative badge -->
+          <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bella-dark/80 backdrop-blur-lg border border-bella-gold/20 rounded-full px-5 py-2 flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-bella-gold text-xs"></i>
+            <span class="text-xs text-bella-gray-light font-body">Gerado em <span class="text-bella-white font-semibold">~8 segundos</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in delay-6">
+      <span class="text-[10px] tracking-[0.3em] uppercase text-bella-gray font-body">Scroll</span>
+      <div class="w-px h-8 bg-gradient-to-b from-bella-gold/50 to-transparent"></div>
+    </div>
+  </header>
+
+  <!-- ==================== MARQUEE SOCIAL PROOF ==================== -->
+  <div class="py-6 border-y border-white/5 overflow-hidden">
+    <div class="marquee-track">
+      <div class="flex items-center gap-12 px-6">
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ Fotos Profissionais</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Inteligência Artificial</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ Alta Resolução</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Legendas Prontas</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ Sem Estúdio</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Publicação Automática</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ 2 Variações por Geração</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Modelos Realistas</span>
+      </div>
+      <div class="flex items-center gap-12 px-6">
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ Fotos Profissionais</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Inteligência Artificial</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ Alta Resolução</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Legendas Prontas</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ Sem Estúdio</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Publicação Automática</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gray whitespace-nowrap font-body">★ 2 Variações por Geração</span>
+        <span class="text-xs tracking-[0.3em] uppercase text-bella-gold whitespace-nowrap font-body">✦ Modelos Realistas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== A DOR vs. SOLUÇÃO ==================== -->
+  <section id="solucao" class="py-24 sm:py-32 relative">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8">
+
+      <!-- Section Label -->
+      <div class="text-center mb-20 reveal">
+        <span class="text-[10px] tracking-[0.4em] uppercase text-bella-gold font-body">O Problema × A Solução</span>
+        <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl mt-4 font-medium leading-tight">
+          Você sabe que precisa de boas fotos.<br>
+          <span class="italic text-bella-gold-light">Nós tornamos isso possível.</span>
+        </h2>
+      </div>
+
+      <!-- Pain Points -->
+      <div class="grid sm:grid-cols-3 gap-4 sm:gap-6 mb-16 reveal">
+        <div class="pain-card rounded-2xl p-6 sm:p-8 text-center group">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-red-500/5 border border-red-500/10 flex items-center justify-center mb-5 group-hover:border-red-500/20 transition-colors">
+            <i class="fa-solid fa-money-bill-wave text-red-400/60 text-lg"></i>
+          </div>
+          <h3 class="font-display text-lg mb-2">Custo alto de modelos</h3>
+          <p class="text-sm text-bella-gray leading-relaxed font-body">
+            Um ensaio fotográfico profissional pode custar R$&nbsp;2.000+ por sessão — inviável para quem está começando.
+          </p>
+        </div>
+        <div class="pain-card rounded-2xl p-6 sm:p-8 text-center group">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-orange-500/5 border border-orange-500/10 flex items-center justify-center mb-5 group-hover:border-orange-500/20 transition-colors">
+            <i class="fa-solid fa-sun text-orange-400/60 text-lg"></i>
+          </div>
+          <h3 class="font-display text-lg mb-2">Dificuldade de iluminação</h3>
+          <p class="text-sm text-bella-gray leading-relaxed font-body">
+            Sem equipamento adequado, suas fotos ficam amadoras e não transmitem a qualidade do seu produto.
+          </p>
+        </div>
+        <div class="pain-card rounded-2xl p-6 sm:p-8 text-center group">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-purple-500/5 border border-purple-500/10 flex items-center justify-center mb-5 group-hover:border-purple-500/20 transition-colors">
+            <i class="fa-solid fa-clock text-purple-400/60 text-lg"></i>
+          </div>
+          <h3 class="font-display text-lg mb-2">Falta de tempo para edição</h3>
+          <p class="text-sm text-bella-gray leading-relaxed font-body">
+            Entre gerenciar estoque, atender clientes e postar, editar fotos é sempre o que fica para depois.
+          </p>
+        </div>
+      </div>
+
+      <div class="section-divider mb-16"></div>
+
+      <!-- Solution -->
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center reveal">
+        <div>
+          <span class="inline-block text-[10px] tracking-[0.4em] uppercase text-bella-gold font-body mb-4">A Solução Bella Imagem</span>
+          <h3 class="font-display text-2xl sm:text-3xl lg:text-4xl font-medium leading-tight mb-6">
+            Fotos dignas de editorial.<br>
+            <span class="italic text-bella-gold-light">Geradas por IA em segundos.</span>
+          </h3>
+          <p class="text-bella-gray-light font-body leading-relaxed mb-8">
+            A Bella Imagem usa inteligência artificial avançada para gerar imagens com modelos realistas vestindo seus produtos. 
+            Resultado profissional, alta resolução e legendas prontas para o Instagram — tudo em poucos cliques.
+          </p>
+          <div class="space-y-4">
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 rounded-lg bg-bella-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa-solid fa-check text-bella-gold text-xs"></i>
+              </div>
+              <div>
+                <span class="text-sm font-semibold font-body">Fotos geradas por IA avançada</span>
+                <p class="text-xs text-bella-gray mt-0.5 font-body">Modelos realistas com poses e cenários profissionais</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 rounded-lg bg-bella-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa-solid fa-check text-bella-gold text-xs"></i>
+              </div>
+              <div>
+                <span class="text-sm font-semibold font-body">Alta resolução para qualquer mídia</span>
+                <p class="text-xs text-bella-gray mt-0.5 font-body">Download pronto para feed, stories e catálogos</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 rounded-lg bg-bella-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa-solid fa-check text-bella-gold text-xs"></i>
+              </div>
+              <div>
+                <span class="text-sm font-semibold font-body">Legendas prontas para Instagram</span>
+                <p class="text-xs text-bella-gray mt-0.5 font-body">Copy otimizado com hashtags e chamadas para ação</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison visual -->
+        <div class="relative">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="rounded-2xl border border-red-500/10 bg-red-500/[0.02] p-5 sm:p-6">
+              <span class="text-[10px] tracking-[0.3em] uppercase text-red-400/60 font-body">Antes</span>
+              <div class="mt-4 space-y-3">
+                <div class="flex items-center gap-2 text-xs text-bella-gray font-body"><i class="fa-solid fa-xmark text-red-400/40 w-4 text-center"></i> R$ 2.000+ por ensaio</div>
+                <div class="flex items-center gap-2 text-xs text-bella-gray font-body"><i class="fa-solid fa-xmark text-red-400/40 w-4 text-center"></i> 3-5 dias de produção</div>
+                <div class="flex items-center gap-2 text-xs text-bella-gray font-body"><i class="fa-solid fa-xmark text-red-400/40 w-4 text-center"></i> Poucas variações</div>
+                <div class="flex items-center gap-2 text-xs text-bella-gray font-body"><i class="fa-solid fa-xmark text-red-400/40 w-4 text-center"></i> Edição manual</div>
+                <div class="flex items-center gap-2 text-xs text-bella-gray font-body"><i class="fa-solid fa-xmark text-red-400/40 w-4 text-center"></i> Sem legendas</div>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-bella-gold/20 bg-bella-gold/[0.02] p-5 sm:p-6">
+              <span class="text-[10px] tracking-[0.3em] uppercase text-bella-gold font-body">Com Bella</span>
+              <div class="mt-4 space-y-3">
+                <div class="flex items-center gap-2 text-xs text-bella-white font-body"><i class="fa-solid fa-check text-bella-gold w-4 text-center"></i> A partir de R$ 0</div>
+                <div class="flex items-center gap-2 text-xs text-bella-white font-body"><i class="fa-solid fa-check text-bella-gold w-4 text-center"></i> ~8 segundos</div>
+                <div class="flex items-center gap-2 text-xs text-bella-white font-body"><i class="fa-solid fa-check text-bella-gold w-4 text-center"></i> 2 variações/geração</div>
+                <div class="flex items-center gap-2 text-xs text-bella-white font-body"><i class="fa-solid fa-check text-bella-gold w-4 text-center"></i> Tudo automático</div>
+                <div class="flex items-center gap-2 text-xs text-bella-white font-body"><i class="fa-solid fa-check text-bella-gold w-4 text-center"></i> Legendas com IA</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FUNCIONALIDADES ==================== -->
+  <section id="funcionalidades" class="py-24 sm:py-32 relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-bella-gold/[0.015] to-transparent pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 relative">
+
+      <div class="text-center mb-20 reveal">
+        <span class="text-[10px] tracking-[0.4em] uppercase text-bella-gold font-body">Funcionalidades</span>
+        <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl mt-4 font-medium leading-tight">
+          Tudo que você precisa para<br>
+          <span class="italic text-bella-gold-light">vender mais com imagens.</span>
+        </h2>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 reveal">
+        <!-- Feature 1 -->
+        <div class="feature-card rounded-2xl p-6 sm:p-8 group">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-bella-gold/10 to-bella-rose/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <i class="fa-solid fa-wand-magic-sparkles text-bella-gold"></i>
+          </div>
+          <h3 class="font-display text-lg mb-2">Geração Personalizada</h3>
+          <p class="text-sm text-bella-gray leading-relaxed font-body">
+            Envie a foto do seu produto e a IA gera uma modelo realista vestindo-o com cenário profissional.
+          </p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="feature-card rounded-2xl p-6 sm:p-8 group">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-bella-rose/10 to-bella-gold/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <i class="fa-solid fa-clone text-bella-rose"></i>
+          </div>
+          <h3 class="font-display text-lg mb-2">2 Variações por Geração</h3>
+          <p class="text-sm text-bella-gray leading-relaxed font-body">
+            Cada geração cria 2 opções diferentes — mais escolhas para encontrar a foto perfeita.
+          </p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="feature-card rounded-2xl p-6 sm:p-8 group">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-bella-gold/10 to-bella-rose/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <i class="fa-solid fa-pen-fancy text-bella-gold-light"></i>
+          </div>
+          <h3 class="font-display text-lg mb-2">Legendas Automáticas</h3>
+          <p class="text-sm text-bella-gray leading-relaxed font-body">
+            A IA gera legendas otimizadas com hashtags e CTAs prontas para copiar e postar no Instagram.
+          </p>
+        </div>
+        <!-- Feature 4 -->
+        <div class="feature-card rounded-2xl p-6 sm:p-8 group">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-bella-rose/10 to-bella-gold/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <i class="fa-solid fa-download text-bella-rose-light"></i>
+          </div>
+          <h3 class="font-display text-lg mb-2">Download em Alta Resolução</h3>
+          <p class="text-sm text-bella-gray leading-relaxed font-body">
+            Baixe suas imagens em qualidade profissional, prontas para feed, stories, catálogos e marketplaces.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PLANOS ==================== -->
+  <section id="planos" class="py-24 sm:py-32 relative">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8">
+
+      <div class="text-center mb-20 reveal">
+        <span class="text-[10px] tracking-[0.4em] uppercase text-bella-gold font-body">Planos &amp; Preços</span>
+        <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl mt-4 font-medium leading-tight">
+          Escolha o plano ideal para<br>
+          <span class="italic text-bella-gold-light">escalar seu conteúdo visual.</span>
+        </h2>
+        <p class="text-bella-gray font-body mt-4 max-w-lg mx-auto text-sm">
+          Comece gratuitamente e evolua conforme sua loja cresce. Sem fidelidade, cancele quando quiser.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 reveal">
+
+        <!-- Gratuito -->
+        <div class="plan-card rounded-2xl p-6 sm:p-7 flex flex-col">
+          <div class="mb-6">
+            <span class="text-[10px] tracking-[0.3em] uppercase text-bella-gray font-body">Gratuito</span>
+            <div class="mt-3 flex items-baseline gap-1">
+              <span class="font-display text-3xl font-semibold">R$ 0</span>
+              <span class="text-xs text-bella-gray font-body">/mês</span>
+            </div>
+          </div>
+          <div class="space-y-3 flex-1 mb-8">
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">15 imagens/mês</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">2 variações por geração</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Alta resolução</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-xmark text-white/10 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray/40">Geração de legendas</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-xmark text-white/10 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray/40">Publicação no Instagram</span>
+            </div>
+          </div>
+          <a href="#" class="btn-outline w-full py-3 rounded-full text-xs tracking-widest uppercase text-center block">
+            Criar Conta Grátis
+          </a>
+        </div>
+
+        <!-- Starter -->
+        <div class="plan-card rounded-2xl p-6 sm:p-7 flex flex-col">
+          <div class="mb-6">
+            <span class="text-[10px] tracking-[0.3em] uppercase text-bella-gray font-body">Starter</span>
+            <div class="mt-3 flex items-baseline gap-1">
+              <span class="font-display text-3xl font-semibold">R$ 149</span>
+              <span class="text-xs text-bella-gray font-body">/mês</span>
+            </div>
+          </div>
+          <div class="space-y-3 flex-1 mb-8">
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">100 imagens/mês</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">2 variações por geração</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Alta resolução</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Geração de legendas</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-xmark text-white/10 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray/40">Publicação no Instagram</span>
+            </div>
+          </div>
+          <a href="#" onclick="alert('Redirecionando para checkout Asaas — Plano Starter')" class="btn-outline w-full py-3 rounded-full text-xs tracking-widest uppercase text-center block">
+            Assinar Starter
+          </a>
+        </div>
+
+        <!-- Pro (Featured) -->
+        <div class="plan-card plan-featured rounded-2xl p-6 sm:p-7 flex flex-col relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-bella-gold to-bella-gold-light text-bella-black text-[10px] tracking-[0.2em] uppercase font-bold px-5 py-1 rounded-full">
+            Mais Popular
+          </div>
+          <div class="mb-6 mt-2">
+            <span class="text-[10px] tracking-[0.3em] uppercase text-bella-gold font-body">Pro</span>
+            <div class="mt-3 flex items-baseline gap-1">
+              <span class="font-display text-3xl font-semibold shimmer-text">R$ 499</span>
+              <span class="text-xs text-bella-gray font-body">/mês</span>
+            </div>
+            <p class="text-[11px] text-bella-gold/60 font-body mt-1">R$ 1,25 por imagem</p>
+          </div>
+          <div class="space-y-3 flex-1 mb-8">
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold text-xs w-4 text-center"></i>
+              <span class="text-bella-white font-medium">400 imagens/mês</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold text-xs w-4 text-center"></i>
+              <span class="text-bella-white font-medium">2 variações por geração</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold text-xs w-4 text-center"></i>
+              <span class="text-bella-white font-medium">Alta resolução</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold text-xs w-4 text-center"></i>
+              <span class="text-bella-white font-medium">Geração de legendas</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold text-xs w-4 text-center"></i>
+              <span class="text-bella-white font-medium">Publicação no Instagram</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold text-xs w-4 text-center"></i>
+              <span class="text-bella-white font-medium">Suporte prioritário</span>
+            </div>
+          </div>
+          <a href="#" onclick="alert('Redirecionando para checkout Asaas — Plano Pro')" class="btn-primary w-full py-3.5 rounded-full text-xs tracking-widest uppercase text-center block">
+            <span>Assinar Pro</span>
+          </a>
+        </div>
+
+        <!-- Business -->
+        <div class="plan-card rounded-2xl p-6 sm:p-7 flex flex-col">
+          <div class="mb-6">
+            <span class="text-[10px] tracking-[0.3em] uppercase text-bella-gray font-body">Business</span>
+            <div class="mt-3 flex items-baseline gap-1">
+              <span class="font-display text-3xl font-semibold">R$ 1.999</span>
+              <span class="text-xs text-bella-gray font-body">/mês</span>
+            </div>
+            <p class="text-[11px] text-bella-gray/60 font-body mt-1">R$ 1,33 por imagem</p>
+          </div>
+          <div class="space-y-3 flex-1 mb-8">
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">1.500 imagens/mês</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">2 variações por geração</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Alta resolução</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Geração de legendas</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Publicação no Instagram</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Suporte dedicado</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-body">
+              <i class="fa-solid fa-check text-bella-gold/60 text-xs w-4 text-center"></i>
+              <span class="text-bella-gray-light">Relatórios de uso</span>
+            </div>
+          </div>
+          <a href="#" onclick="alert('Redirecionando para checkout Asaas — Plano Business')" class="btn-outline w-full py-3 rounded-full text-xs tracking-widest uppercase text-center block">
+            Assinar Business
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FAQ ==================== -->
+  <section id="faq" class="py-24 sm:py-32 relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-bella-rose/[0.01] to-transparent pointer-events-none"></div>
+    <div class="max-w-3xl mx-auto px-5 sm:px-8 relative">
+
+      <div class="text-center mb-16 reveal">
+        <span class="text-[10px] tracking-[0.4em] uppercase text-bella-gold font-body">Perguntas Frequentes</span>
+        <h2 class="font-display text-3xl sm:text-4xl mt-4 font-medium">
+          Tire suas dúvidas.
+        </h2>
+      </div>
+
+      <div class="reveal">
+        <!-- FAQ 1 -->
+        <div class="faq-item py-6 px-2" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-lg">As fotos parecem reais?</h3>
+            <div class="faq-icon w-8 h-8 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-plus text-xs text-bella-gold"></i>
+            </div>
+          </div>
+          <div class="faq-answer">
+            <p class="text-sm text-bella-gray leading-relaxed font-body pt-4 pb-2">
+              Sim! Nossa IA utiliza modelos de última geração treinados especificamente para o mercado de moda. 
+              As imagens são criadas com realismo fotográfico — iluminação natural, poses profissionais e cenários adequados. 
+              A maioria dos consumidores não consegue diferenciar de uma foto tirada em estúdio real.
+            </p>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="faq-item py-6 px-2" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-lg">Posso usar as fotos comercialmente no meu Instagram?</h3>
+            <div class="faq-icon w-8 h-8 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-plus text-xs text-bella-gold"></i>
+            </div>
+          </div>
+          <div class="faq-answer">
+            <p class="text-sm text-bella-gray leading-relaxed font-body pt-4 pb-2">
+              Absolutamente! Todas as imagens geradas na Bella Imagem são de propriedade sua e podem ser usadas 
+              livremente para fins comerciais — Instagram, marketplaces, catálogos impressos, anúncios e qualquer 
+              outro material de divulgação da sua loja.
+            </p>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="faq-item py-6 px-2" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-lg">Como funciona o cancelamento?</h3>
+            <div class="faq-icon w-8 h-8 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-plus text-xs text-bella-gold"></i>
+            </div>
+          </div>
+          <div class="faq-answer">
+            <p class="text-sm text-bella-gray leading-relaxed font-body pt-4 pb-2">
+              Sem burocracia! Você pode cancelar sua assinatura a qualquer momento diretamente pelo painel. 
+              Após o cancelamento, você continua com acesso até o final do período já pago. 
+              Não há multas, taxas de cancelamento ou fidelidade mínima.
+            </p>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="faq-item py-6 px-2 border-b-0" onclick="toggleFaq(this)">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-display text-lg">O que acontece se minha cota acabar?</h3>
+            <div class="faq-icon w-8 h-8 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-plus text-xs text-bella-gold"></i>
+            </div>
+          </div>
+          <div class="faq-answer">
+            <p class="text-sm text-bella-gray leading-relaxed font-body pt-4 pb-2">
+              Sua cota de imagens é renovada automaticamente todo mês na data de aniversário da sua assinatura. 
+              Se você atingir o limite antes da renovação, poderá fazer upgrade para um plano maior a qualquer momento. 
+              Créditos não utilizados não acumulam para o mês seguinte.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CTA FINAL ==================== -->
+  <section class="py-24 sm:py-32 relative overflow-hidden">
+    <div class="absolute inset-0 hero-mesh"></div>
+    <div class="float-element" style="width:400px;height:400px;top:-10%;left:50%;border-color:rgba(201,169,110,0.06);animation:float 10s ease-in-out infinite;"></div>
+
+    <div class="max-w-3xl mx-auto px-5 sm:px-8 text-center relative reveal">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-bella-gold/20 bg-bella-gold/5 mb-8">
+        <i class="fa-solid fa-rocket text-bella-gold text-xs"></i>
+        <span class="text-xs tracking-widest uppercase text-bella-gold font-body">Comece Agora</span>
+      </div>
+      <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-medium leading-tight">
+        Sua vitrine digital merece<br>
+        <span class="italic shimmer-text">fotos de editorial.</span>
+      </h2>
+      <p class="text-bella-gray-light font-body mt-6 max-w-md mx-auto leading-relaxed">
+        Junte-se a milhares de lojistas que já transformaram seus perfis com a Bella Imagem. Crie sua conta gratuita em menos de 1 minuto.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+        <a href="#planos" class="btn-primary px-10 py-4 rounded-full text-sm tracking-widest uppercase">
+          <span><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Começar Gratuitamente</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-white/5 py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 mb-16">
+
+        <!-- Brand -->
+        <div class="sm:col-span-2 lg:col-span-1">
+          <a href="#" class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-bella-gold to-bella-rose flex items-center justify-center">
+              <i class="fa-solid fa-sparkles text-bella-black text-xs"></i>
+            </div>
+            <span class="font-display text-lg font-semibold">Bella<span class="text-bella-gold">Imagem</span></span>
+          </a>
+          <p class="text-xs text-bella-gray font-body leading-relaxed max-w-xs">
+            Fotos profissionais de moda geradas por inteligência artificial para lojistas que querem vender mais.
+          </p>
+        </div>
+
+        <!-- Produto -->
+        <div>
+          <h4 class="text-[10px] tracking-[0.3em] uppercase text-bella-gray font-body mb-4">Produto</h4>
+          <div class="space-y-2.5">
+            <a href="#funcionalidades" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Funcionalidades</a>
+            <a href="#planos" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Planos e Preços</a>
+            <a href="#faq" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Perguntas Frequentes</a>
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">API para Desenvolvedores</a>
+          </div>
+        </div>
+
+        <!-- Institucional -->
+        <div>
+          <h4 class="text-[10px] tracking-[0.3em] uppercase text-bella-gray font-body mb-4">Institucional</h4>
+          <div class="space-y-2.5">
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Sobre Nós</a>
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Blog</a>
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Carreiras</a>
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Contato</a>
+          </div>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <h4 class="text-[10px] tracking-[0.3em] uppercase text-bella-gray font-body mb-4">Legal</h4>
+          <div class="space-y-2.5">
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Termos de Uso</a>
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Política de Privacidade</a>
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">Política de Cookies</a>
+            <a href="#" class="block text-sm text-bella-gray-light hover:text-bella-gold transition-colors font-body">LGPD</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider mb-8"></div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-bella-gray font-body">
+          &copy; 2026 Bella Imagem. Todos os direitos reservados.
+        </p>
+        <div class="flex items-center gap-4">
+          <a href="#" class="w-9 h-9 rounded-full border border-white/5 flex items-center justify-center text-bella-gray hover:text-bella-gold hover:border-bella-gold/20 transition-all">
+            <i class="fa-brands fa-instagram text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 rounded-full border border-white/5 flex items-center justify-center text-bella-gray hover:text-bella-gold hover:border-bella-gold/20 transition-all">
+            <i class="fa-brands fa-tiktok text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 rounded-full border border-white/5 flex items-center justify-center text-bella-gray hover:text-bella-gold hover:border-bella-gold/20 transition-all">
+            <i class="fa-brands fa-linkedin-in text-sm"></i>
+          </a>
+          <a href="#" class="w-9 h-9 rounded-full border border-white/5 flex items-center justify-center text-bella-gray hover:text-bella-gold hover:border-bella-gold/20 transition-all">
+            <i class="fa-brands fa-youtube text-sm"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // Mobile nav
+    function toggleMobile() {
+      document.getElementById('mobileNav').classList.toggle('open');
+    }
+
+    // Navbar scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 60) {
+        navbar.style.background = 'rgba(10,10,10,0.85)';
+        navbar.style.backdropFilter = 'blur(20px)';
+        navbar.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+      } else {
+        navbar.style.background = 'transparent';
+        navbar.style.backdropFilter = 'none';
+        navbar.style.borderBottom = 'none';
+      }
+    });
+
+    // FAQ toggle
+    function toggleFaq(el) {
+      const isActive = el.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+      if (!isActive) el.classList.add('active');
+    }
+
+    // Intersection Observer for reveals
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
