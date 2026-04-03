@@ -240,12 +240,86 @@
       background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(232,180,184,0.1));
       position: relative;
       overflow: hidden;
+      cursor: pointer;
     }
     .mock-img::after {
       content: '';
       position: absolute;
       inset: 0;
       background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%);
+      z-index: 2;
+      transition: opacity 0.5s ease;
+    }
+    /* Hidden preview image layer */
+    .mock-img .preview-img {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: scale(1.08);
+      z-index: 1;
+    }
+    /* Dark mask over the image */
+    .mock-img .preview-mask {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.7);
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 2;
+    }
+    /* Default content (icon + label) */
+    .mock-img .mock-content {
+      position: relative;
+      z-index: 3;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    /* Hover / touch states */
+    .mock-img:hover .preview-img,
+    .mock-img.touched .preview-img {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .mock-img:hover .preview-mask,
+    .mock-img.touched .preview-mask {
+      opacity: 1;
+    }
+    .mock-img:hover .mock-content,
+    .mock-img.touched .mock-content {
+      opacity: 1;
+      transform: translateY(-4px);
+    }
+    .mock-img:hover::after,
+    .mock-img.touched::after {
+      opacity: 0;
+    }
+    /* "Gerado com IA" micro-label on hover */
+    .mock-img .preview-label {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+      z-index: 4;
+      white-space: nowrap;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(201,169,110,0.8);
+      background: rgba(10,10,10,0.6);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(201,169,110,0.15);
+    }
+    .mock-img:hover .preview-label,
+    .mock-img.touched .preview-label {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
@@ -297,7 +371,7 @@
       <span class="text-[10px] tracking-[0.4em] uppercase text-bella-gray font-body">Inteligência Artificial × Moda</span>
     </div>
 
-    <div class="max-w-7xl mx-auto px-5 sm:px-8 w-full pt-28 pb-20 lg:pt-0 lg:pb-0">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 w-full pt-28 pb-28 lg:pt-0 lg:pb-16">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
 
         <!-- Left Content -->
@@ -341,31 +415,51 @@
         </div>
 
         <!-- Right: Mockup Grid -->
-        <div class="relative animate-fade-in delay-3">
+        <div class="relative animate-fade-in delay-3 pb-10">
           <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto lg:max-w-none">
             <div class="space-y-3 sm:space-y-4 pt-8">
               <div class="mock-img rounded-2xl aspect-[3/4] flex flex-col items-center justify-center p-4">
-                <i class="fa-solid fa-camera-retro text-3xl text-bella-gold/30 mb-3"></i>
-                <span class="text-[10px] tracking-widest uppercase text-bella-gray">Editorial Look</span>
+                <div class="preview-img" style="background-image: url('https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80');"></div>
+                <div class="preview-mask"></div>
+                <div class="mock-content flex flex-col items-center justify-center">
+                  <i class="fa-solid fa-camera-retro text-3xl text-bella-gold/30 mb-3"></i>
+                  <span class="text-[10px] tracking-widest uppercase text-bella-gray">Editorial Look</span>
+                </div>
+                <span class="preview-label"><i class="fa-solid fa-sparkles" style="margin-right:4px;font-size:8px;"></i> Gerado com IA</span>
               </div>
               <div class="mock-img rounded-2xl aspect-square flex flex-col items-center justify-center p-4">
-                <i class="fa-solid fa-wand-magic-sparkles text-2xl text-bella-rose/30 mb-2"></i>
-                <span class="text-[10px] tracking-widest uppercase text-bella-gray">IA Gen</span>
+                <div class="preview-img" style="background-image: url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80');"></div>
+                <div class="preview-mask"></div>
+                <div class="mock-content flex flex-col items-center justify-center">
+                  <i class="fa-solid fa-wand-magic-sparkles text-2xl text-bella-rose/30 mb-2"></i>
+                  <span class="text-[10px] tracking-widest uppercase text-bella-gray">IA Gen</span>
+                </div>
+                <span class="preview-label"><i class="fa-solid fa-sparkles" style="margin-right:4px;font-size:8px;"></i> Gerado com IA</span>
               </div>
             </div>
             <div class="space-y-3 sm:space-y-4">
               <div class="mock-img rounded-2xl aspect-square flex flex-col items-center justify-center p-4">
-                <i class="fa-solid fa-image text-2xl text-bella-gold/30 mb-2"></i>
-                <span class="text-[10px] tracking-widest uppercase text-bella-gray">Alta Resolução</span>
+                <div class="preview-img" style="background-image: url('https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80');"></div>
+                <div class="preview-mask"></div>
+                <div class="mock-content flex flex-col items-center justify-center">
+                  <i class="fa-solid fa-image text-2xl text-bella-gold/30 mb-2"></i>
+                  <span class="text-[10px] tracking-widest uppercase text-bella-gray">Alta Resolução</span>
+                </div>
+                <span class="preview-label"><i class="fa-solid fa-sparkles" style="margin-right:4px;font-size:8px;"></i> Gerado com IA</span>
               </div>
               <div class="mock-img rounded-2xl aspect-[3/4] flex flex-col items-center justify-center p-4">
-                <i class="fa-brands fa-instagram text-3xl text-bella-rose/30 mb-3"></i>
-                <span class="text-[10px] tracking-widest uppercase text-bella-gray">Pronto p/ Post</span>
+                <div class="preview-img" style="background-image: url('https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&q=80');"></div>
+                <div class="preview-mask"></div>
+                <div class="mock-content flex flex-col items-center justify-center">
+                  <i class="fa-brands fa-instagram text-3xl text-bella-rose/30 mb-3"></i>
+                  <span class="text-[10px] tracking-widest uppercase text-bella-gray">Pronto p/ Post</span>
+                </div>
+                <span class="preview-label"><i class="fa-solid fa-sparkles" style="margin-right:4px;font-size:8px;"></i> Gerado com IA</span>
               </div>
             </div>
           </div>
           <!-- Decorative badge -->
-          <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-bella-dark/80 backdrop-blur-lg border border-bella-gold/20 rounded-full px-5 py-2 flex items-center gap-2">
+          <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-bella-dark/80 backdrop-blur-lg border border-bella-gold/20 rounded-full px-5 py-2 flex items-center gap-2 z-10">
             <i class="fa-solid fa-bolt text-bella-gold text-xs"></i>
             <span class="text-xs text-bella-gray-light font-body">Gerado em <span class="text-bella-white font-semibold">~8 segundos</span></span>
           </div>
@@ -987,6 +1081,24 @@
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Touch support for mock-img preview on mobile
+    document.querySelectorAll('.mock-img').forEach(card => {
+      card.addEventListener('touchstart', function(e) {
+        // Remove touched class from all other cards
+        document.querySelectorAll('.mock-img.touched').forEach(c => {
+          if (c !== this) c.classList.remove('touched');
+        });
+        this.classList.toggle('touched');
+      }, { passive: true });
+    });
+
+    // Close touched cards when tapping elsewhere
+    document.addEventListener('touchstart', function(e) {
+      if (!e.target.closest('.mock-img')) {
+        document.querySelectorAll('.mock-img.touched').forEach(c => c.classList.remove('touched'));
+      }
+    }, { passive: true });
   </script>
 
 </body>
