@@ -1061,6 +1061,137 @@
 
   <!-- ==================== SCRIPTS ==================== -->
   <script>
+    // ========== META CONVERSIONS API + PIXEL TRACKING ==========
+    function generateEventId() {
+      return 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? match[2] : null;
+    }
+
+    function trackEvent(eventName, customData) {
+      const eventId = generateEventId();
+
+      // 1) Pixel (browser-side)
+      fbq('track', eventName, customData || {}, { eventID: eventId });
+
+      // 2) Conversions API (server-side)
+      fetch('/api/conversions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_name: eventName,
+          event_id: eventId,
+          event_source_url: window.location.href,
+          user_data: {
+            fbp: getCookie('_fbp'),
+            fbc: getCookie('_fbc'),
+          },
+          custom_data: customData || undefined,
+        }),
+      }).catch(function() {}); // silent fail — pixel is the fallback
+    }
+
+    // Track PageView via CAPI (pixel already fires on load)
+    (function() {
+      var pvId = generateEventId();
+      fetch('/api/conversions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_name: 'PageView',
+          event_id: pvId,
+          event_source_url: window.location.href,
+          user_data: {
+            fbp: getCookie('_fbp'),
+            fbc: getCookie('_fbc'),
+          },
+        }),
+      }).catch(function() {});
+    })();
+
+    // Track ViewContent when sections become visible
+    var trackedSections = {};
+    var sectionObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !trackedSections[entry.target.id]) {
+          trackedSections[entry.target.id] = true;
+          trackEvent('ViewContent', {
+            content_name: entry.target.id,
+            content_category: 'Section',
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('section[id]').forEach(function(s) {
+      sectionObserver.observe(s);
+    });
+
+    // Track clicks on plan buttons (InitiateCheckout)
+    document.querySelectorAll('a[href*="register?plan="]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        var plan = this.href.split('plan=')[1] || 'unknown';
+        trackEvent('InitiateCheckout', {
+          content_name: plan,
+          content_category: 'Plano',
+          currency: 'BRL',
+          value: { free: 0, starter: 149, pro: 499, business: 1999 }[plan] || 0,
+        });
+        trackEvent('Lead', {
+          content_name: 'Registro ' + plan,
+          content_category: 'Plano',
+        });
+      });
+    });
+
+    // Track clicks on "Começar" / CTA buttons (CompleteRegistration intent)
+    document.querySelectorAll('a[href="#planos"]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        trackEvent('Search', {
+          search_string: 'planos',
+          content_category: 'CTA',
+        });
+      });
+    });
+
+    // Track footer contact link
+    document.querySelectorAll('a[href*="/contato"]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        trackEvent('Contact', {
+          content_name: 'Pagina Contato',
+        });
+      });
+    });
+
+    // Track affiliate link
+    document.querySelectorAll('a[href*="afiliado"]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        trackEvent('FindLocation', {
+          content_name: 'Programa Afiliados',
+        });
+      });
+    });
+
+    // Track scroll depth (AddToWishlist at 75% scroll)
+    var scrollTracked = false;
+    window.addEventListener('scroll', function() {
+      if (!scrollTracked) {
+        var scrollPercent = (window.scrollY + window.innerHeight) / document.body.scrollHeight;
+        if (scrollPercent > 0.75) {
+          scrollTracked = true;
+          trackEvent('AddToWishlist', {
+            content_name: 'Deep Scroll 75%',
+            content_category: 'Engagement',
+          });
+        }
+      }
+    });
+
+    // ========== EXISTING SCRIPTS ==========
+
     // Mobile nav
     function toggleMobile() {
       document.getElementById('mobileNav').classList.toggle('open');
